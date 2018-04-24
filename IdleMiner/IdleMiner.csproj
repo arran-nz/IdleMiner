@@ -80,8 +80,10 @@
   </ItemGroup>
   <ItemGroup>
     <Compile Include="Assets\Scripts\Elevator.cs" />
-    <Compile Include="Assets\Scripts\Mine.cs" />
+    <Compile Include="Assets\Scripts\Miner.cs" />
+    <Compile Include="Assets\Scripts\StringFormatHelper.cs" />
     <Compile Include="Assets\Scripts\Worker.cs" />
+    <Compile Include="Assets\Scripts\WorkingArea.cs" />
   </ItemGroup>
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
   <Target Name="GenerateTargetFrameworkMonikerAttribute" />

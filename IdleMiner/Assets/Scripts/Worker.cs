@@ -4,33 +4,54 @@ using UnityEngine;
 
 public class Worker : MonoBehaviour {
 
-    public TextMesh carryValueText;
+    protected SpriteRenderer workerSprite;
+    private TextMesh carryValueText;
+    private WorkingArea myArea;
 
-    private Mine myMine;
-
-    public float WalkingSpeed = 1f;
-    public float MiningSpeed = 1f;
-    public float CarryCapacity = 10f;
-
-
-    private enum WorkerStates
+    private float movementSpeed
     {
-        walkToMine,
-        mine,
-        walkToBucket,
-        emptyLoad,
-        waitingForWork
+        get
+        {
+            return myArea.MovementSpeed;
+        }
+    }
+    private float collectionSpeed
+    {
+        get
+        {
+            return myArea.CollectionSpeed;
+        }
+    }
+    private float carryCapacity
+    {
+        get
+        {
+            return myArea.CarryCapacity;
+        }
+    }
+
+
+    private WorkerStates currentState;
+    protected enum WorkerStates
+    {
+        moveToCollect,
+        collect,
+        moveToContainer,
+        dropOff,
+        waitForOrders
 
     }
 
     private float currentCarryAmount;
-    private WorkerStates currentState;
 
-    private void Awake()
+    protected virtual void Awake()
     {
-        myMine = gameObject.GetComponentInParent<Mine>();
+        carryValueText = gameObject.GetComponentInChildren<TextMesh>();
+        workerSprite = gameObject.GetComponentInChildren<SpriteRenderer>();
+        myArea = gameObject.GetComponentInParent<WorkingArea>();
+
         UpdateText(0);
-        currentState = WorkerStates.walkToMine;
+        currentState = WorkerStates.waitForOrders;
     }
 
     // Update is called once per frame
@@ -38,20 +59,22 @@ public class Worker : MonoBehaviour {
 
         switch (currentState)
         {
-            case WorkerStates.walkToMine:
-                WalkToLocation(myMine.MinePosition, WorkerStates.mine);
+            case WorkerStates.moveToCollect:
+                MoveToLocation(myArea.CollectPosition, WorkerStates.collect);
+                workerSprite.flipX = false;
                 break;
-            case WorkerStates.mine:
-                Mine(WorkerStates.walkToBucket);
+            case WorkerStates.collect:
+                Collect(WorkerStates.moveToContainer);
                 break;
-            case WorkerStates.walkToBucket:
-                WalkToLocation(myMine.BucketPosition, WorkerStates.emptyLoad);
+            case WorkerStates.moveToContainer:
+                MoveToLocation(myArea.DropOffPosition, WorkerStates.dropOff);
+                workerSprite.flipX = true;
                 break;
-            case WorkerStates.emptyLoad:
-                EmptyLoad(WorkerStates.walkToMine);
+            case WorkerStates.dropOff:
+                EmptyLoad(WorkerStates.waitForOrders);
                 break;
-            case WorkerStates.waitingForWork:
-                WaitForWork(WorkerStates.walkToMine);
+            case WorkerStates.waitForOrders:
+                WaitForWork(WorkerStates.moveToCollect);
                 break;
             default:
                 break;
@@ -59,46 +82,49 @@ public class Worker : MonoBehaviour {
 
     }
 
-    void WaitForWork(WorkerStates nextDesiredState)
+    protected virtual void WaitForWork(WorkerStates nextDesiredState)
     {
-        if(myMine.ManangerPresent)
+        if (myArea.ManangerPresent)
         {
             currentState = nextDesiredState;
         }
         else
         {
-            // USER TAPS SCREEN
+            //  WAIT FOR USER TO TAP SCREEN
         }
     }
 
-    void EmptyLoad(WorkerStates nextDesiredState)
+    protected virtual void EmptyLoad(WorkerStates nextDesiredState)
     {
-        myMine.AddToBucket(currentCarryAmount);
+        myArea.DropOff(currentCarryAmount);
         currentCarryAmount = 0;
         UpdateText(currentCarryAmount);
         currentState = nextDesiredState;
     }
 
 
-    void Mine(WorkerStates nextDesiredState)
+    protected virtual void Collect(WorkerStates nextDesiredState)
     {
-        // Run every second
-        if(currentCarryAmount + MiningSpeed <= CarryCapacity)
+        float amountToAdd = (1 * Time.deltaTime) * collectionSpeed;
+        if (currentCarryAmount + amountToAdd  <= carryCapacity)
         {
-            currentCarryAmount += MiningSpeed;
+            currentCarryAmount += amountToAdd;
             UpdateText(currentCarryAmount);
         }
         else
         {
+            currentCarryAmount = carryCapacity;
+            UpdateText(currentCarryAmount);
+
             currentState = nextDesiredState;
         }
     }
 
-    void WalkToLocation(Vector2 position, WorkerStates nextDesiredState)
+    protected virtual void MoveToLocation(Vector2 position, WorkerStates nextDesiredState)
     {
         if ((Vector2)transform.position != position)
         {
-            transform.position = Vector2.MoveTowards(transform.position, position, WalkingSpeed * Time.deltaTime);
+            transform.position = Vector2.MoveTowards(transform.position, position, movementSpeed * Time.deltaTime);
         }
         else
         {
@@ -108,7 +134,7 @@ public class Worker : MonoBehaviour {
 
     void UpdateText(float newAmount)
     {
-        carryValueText.text = newAmount + "k";
+        carryValueText.text = StringFormatHelper.GetCurrencyString(newAmount);
     }
 
 }

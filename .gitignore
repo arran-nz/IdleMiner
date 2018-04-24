@@ -5,3 +5,6 @@ IdleMiner/.vs/
 IdleMiner/Library/
 IdleMiner/Temp/
 *.dll
+*.meta
+*.meta
+*.meta

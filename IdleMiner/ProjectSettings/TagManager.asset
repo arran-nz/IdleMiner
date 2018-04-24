@@ -41,3 +41,9 @@ TagManager:
   - name: Default
     uniqueID: 0
     locked: 0
+  - name: Rocks
+    uniqueID: 3944153761
+    locked: 0
+  - name: Worker
+    uniqueID: 1837390313
+    locked: 0
