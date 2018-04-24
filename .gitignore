@@ -1,0 +1,7 @@
+
+IdleMiner/.vs/
+*.lock
+*.ide
+IdleMiner/Library/
+IdleMiner/Temp/
+*.dll
