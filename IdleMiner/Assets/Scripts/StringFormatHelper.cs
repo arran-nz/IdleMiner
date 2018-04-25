@@ -8,12 +8,7 @@ public static class StringFormatHelper {
 	public static string GetCurrencyString (float value) {
 
         string customString = value.ToString("F2");
-        if (customString.EndsWith("00"))
-        {
-            customString = customString.Substring(0, customString.Length - 3);
-        }
-
-        return customString + "a";
+        return customString + " g";
 
     }
 

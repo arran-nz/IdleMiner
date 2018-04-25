@@ -2,7 +2,7 @@
 using System.Collections.Generic;
 using UnityEngine;
 
-public class Miner : Worker {
+public class Miner : WorkerBase {
 
 
     private Animator workerAnimator;
@@ -20,22 +20,17 @@ public class Miner : Worker {
         base.WaitForWork(nextDesiredState);
     }
 
-    protected override void Collect(WorkerStates nextDesiredState)
+    protected override void Collect(WorkerStates nextDesiredState, System.Action<float> finishedCallback)
     {
         workerAnimator.Play("punch");
-        base.Collect(nextDesiredState);
-    }
-
-    protected override void EmptyLoad(WorkerStates nextDesiredState)
-    {
-        base.EmptyLoad(nextDesiredState);
+        base.Collect(nextDesiredState, CollectionUpdate);
     }
     
     protected override void MoveToLocation(Vector2 position, WorkerStates nextDesiredState)
     {
         // Make the miner face the correct direction while moving to the new location.
         Vector2 direction = (Vector2)transform.position - position;
-        workerSprite.flipX = direction.x < 0 ? true : false;
+        workerSprite.flipX = direction.x > 0 ? true : false;
 
         workerAnimator.Play("walk");
 
