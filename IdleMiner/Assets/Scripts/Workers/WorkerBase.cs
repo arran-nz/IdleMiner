@@ -2,7 +2,7 @@
 using System.Collections.Generic;
 using UnityEngine;
 
-public class WorkerBase : MonoBehaviour {
+public abstract class WorkerBase : MonoBehaviour {
 
     private TextMesh carryValueText;
 
@@ -11,21 +11,21 @@ public class WorkerBase : MonoBehaviour {
 
 
 
-    protected float movementSpeed
+    protected float MovementSpeed
     {
         get
         {
             return myArea.MovementSpeed;
         }
     }
-    protected float collectionSpeed
+    protected float CollectionSpeed
     {
         get
         {
             return myArea.CollectionSpeed;
         }
     }
-    protected float carryCapacity
+    protected float CarryCapacity
     {
         get
         {
@@ -33,7 +33,7 @@ public class WorkerBase : MonoBehaviour {
         }
     }
 
-    private float currentCarryAmount;
+    protected float CurrentCarryAmount { get; private set; }
 
 
     protected WorkerStates CurrentState { get; private set; }
@@ -66,7 +66,7 @@ public class WorkerBase : MonoBehaviour {
                 MoveToCollect(WorkerStates.collect);
                 break;
             case WorkerStates.collect:
-                Collect(WorkerStates.moveToDropOff, CollectionUpdate);
+                Collect(WorkerStates.moveToDropOff, null);
                 break;
             case WorkerStates.moveToDropOff:
                 MoveToContainer(WorkerStates.dropOff);
@@ -83,20 +83,14 @@ public class WorkerBase : MonoBehaviour {
 
     }
 
+    /// <summary>
+    /// Called Everyime a collection amount has been update
+    /// </summary>
+    /// <param name="amount"></param>
     protected virtual void CollectionUpdate(float amount)
     {
-        currentCarryAmount += amount;
-        UpdateText(currentCarryAmount);
-    }
-
-    protected virtual void MoveToCollect(WorkerStates nextDesiredState)
-    {
-        MoveToLocation(myArea.CollectPosition, nextDesiredState);
-    }
-
-    protected virtual void MoveToContainer(WorkerStates nextDesiredState)
-    {
-        MoveToLocation(myArea.ContainerPosition, WorkerStates.dropOff);
+        CurrentCarryAmount += amount;
+        UpdateText(CurrentCarryAmount);
     }
 
     protected virtual void WaitForWork(WorkerStates nextDesiredState)
@@ -113,43 +107,57 @@ public class WorkerBase : MonoBehaviour {
 
     protected virtual void EmptyLoad(WorkerStates nextDesiredState)
     {
-        myArea.AddToContainer(currentCarryAmount);
-        currentCarryAmount = 0;
-        UpdateText(currentCarryAmount);
+        myArea.AddToContainer(CurrentCarryAmount);
+        CurrentCarryAmount = 0;
+        UpdateText(CurrentCarryAmount);
         ChangeState(nextDesiredState);
     }
 
 
-    protected virtual void Collect(WorkerStates nextDesiredState, System.Action<float> collectionCallback)
+    protected virtual void Collect(WorkerStates nextDesiredState, System.Func<WorkerStates, WorkerStates> finishedCollecting)
     {
-        float amountToCollect =  Time.deltaTime * collectionSpeed;
+        float amountToCollect =  Time.deltaTime * CollectionSpeed;
         // Collect amount from Resource Amount in The Working Area every frame
-        if ((currentCarryAmount + amountToCollect  <= carryCapacity) && myArea.ResourceAmount > 0)
+        if ((CurrentCarryAmount + amountToCollect  <= CarryCapacity) && myArea.ResourceAmount > 0)
         {
-            myArea.CollectResources(amountToCollect, collectionCallback);
+            myArea.CollectResources(amountToCollect, CollectionUpdate);
         }
         else
         {
-            // If worker has remaining carryCapactiy, fill it up with remaing resources - Finished collecting
-            if (currentCarryAmount < carryCapacity)
-            {
-                float remainderLeft = (carryCapacity - currentCarryAmount);
-                myArea.CollectResources(remainderLeft, collectionCallback);
+            float remainderLeft = (CarryCapacity - CurrentCarryAmount);
+            myArea.CollectResources(remainderLeft, CollectionUpdate);
 
+            //Invote the Finished Collecting Callback if it's not NULL
+            if(finishedCollecting != null)
+            {
+                // Let the callback dertermine what the next state is and return.
+                WorkerStates callbackDesiredState = finishedCollecting.Invoke(nextDesiredState);
+                ChangeState(callbackDesiredState);
+                return;
             }
+
 
             // Change to the next state
             ChangeState(nextDesiredState);
-
         }
 
+    }
+
+    protected virtual void MoveToCollect(WorkerStates nextDesiredState)
+    {
+        MoveToLocation(myArea.CollectPositions[0], nextDesiredState);
+    }
+
+    protected virtual void MoveToContainer(WorkerStates nextDesiredState)
+    {
+        MoveToLocation(myArea.ContainerPosition, WorkerStates.dropOff);
     }
 
     protected virtual void MoveToLocation(Vector2 position, WorkerStates nextDesiredState)
     {
         if ((Vector2)transform.position != position)
         {
-            transform.position = Vector2.MoveTowards(transform.position, position, movementSpeed * Time.deltaTime);
+            transform.position = Vector2.MoveTowards(transform.position, position, MovementSpeed * Time.deltaTime);
         }
         else
         {
@@ -157,12 +165,12 @@ public class WorkerBase : MonoBehaviour {
         }
     }
 
-    protected void UpdateText(float newAmount)
+    private void UpdateText(float newAmount)
     {
         carryValueText.text = StringFormatHelper.GetCurrencyString(newAmount);
     }
 
-    protected void ChangeState(WorkerStates newState)
+    private void ChangeState(WorkerStates newState)
     {
         CurrentState = newState;
     }

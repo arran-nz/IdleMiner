@@ -7,27 +7,10 @@ public abstract class WorkingAreaBase : MonoBehaviour {
 
     [SerializeField]
     private TextMesh containerAmountText;
-
     [SerializeField]
     private Transform containerTransform;
-    [SerializeField]
-    private Transform collectAreaTransform;
 
-    public Vector2 CollectPosition
-    {
-        get
-        {
-            if(collectAreaTransform != null)
-            {
-                return collectAreaTransform.position;
-            }
-            else
-            {
-                throw new System.Exception("Collect Area not defined");
-            }
-
-        }
-    }
+    public List<Vector2> CollectPositions = new List<Vector2>();
 
     public Vector2 ContainerPosition
     {
@@ -46,7 +29,7 @@ public abstract class WorkingAreaBase : MonoBehaviour {
     public float CollectionSpeed { get; protected set; }
     public float CarryCapacity { get; protected set; }
 
-    public float ResourceAmount = Mathf.Infinity;
+    public float ResourceAmount { get; set; }
 
     protected virtual void Start()
     {

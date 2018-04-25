@@ -1,4 +1,5 @@
-﻿using System.Collections;
+﻿using System;
+using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
 
@@ -20,10 +21,10 @@ public class Miner : WorkerBase {
         base.WaitForWork(nextDesiredState);
     }
 
-    protected override void Collect(WorkerStates nextDesiredState, System.Action<float> finishedCallback)
+    protected override void Collect(WorkerStates nextDesiredState, Func<WorkerStates, WorkerStates> finishedCollecting)
     {
         workerAnimator.Play("punch");
-        base.Collect(nextDesiredState, CollectionUpdate);
+        base.Collect(nextDesiredState, finishedCollecting);
     }
     
     protected override void MoveToLocation(Vector2 position, WorkerStates nextDesiredState)
