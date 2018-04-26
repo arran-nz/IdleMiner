@@ -5,9 +5,10 @@ using UnityEngine;
 public abstract class WorkerBase : MonoBehaviour {
 
     private TextMesh carryValueText;
+    protected MeshRenderer CarryValueTextRenderer;
 
-    protected SpriteRenderer workerSprite;
-    protected WorkingAreaBase myArea;
+    protected SpriteRenderer WorkerSprite;
+    protected WorkingAreaBase MyArea;
 
 
 
@@ -15,21 +16,21 @@ public abstract class WorkerBase : MonoBehaviour {
     {
         get
         {
-            return myArea.MovementSpeed;
+            return MyArea.MovementSpeed;
         }
     }
     protected decimal CollectionSpeed
     {
         get
         {
-            return myArea.CollectionSpeed;
+            return MyArea.CollectionSpeed;
         }
     }
     protected decimal CarryCapacity
     {
         get
         {
-            return myArea.CarryCapacity;
+            return MyArea.CarryCapacity;
         }
     }
 
@@ -46,12 +47,12 @@ public abstract class WorkerBase : MonoBehaviour {
         ReceiveOrders
     }
 
-
     protected virtual void Awake()
     {
         carryValueText = gameObject.GetComponentInChildren<TextMesh>();
-        workerSprite = gameObject.GetComponentInChildren<SpriteRenderer>();
-        myArea = gameObject.GetComponentInParent<WorkingAreaBase>();
+        CarryValueTextRenderer = carryValueText.GetComponent<MeshRenderer>();
+        WorkerSprite = gameObject.GetComponentInChildren<SpriteRenderer>();
+        MyArea = gameObject.GetComponentInParent<WorkingAreaBase>();
 
         UpdateCarryAmountText(0);
         ChangeState(WorkerStates.ReceiveOrders);
@@ -94,7 +95,7 @@ public abstract class WorkerBase : MonoBehaviour {
 
     protected virtual void ReceiveOrders(WorkerStates nextDesiredState)
     {
-        if (myArea.ManangerPresent)
+        if (MyArea.ManangerPresent)
         {
             ChangeState(nextDesiredState);
         }
@@ -132,12 +133,12 @@ public abstract class WorkerBase : MonoBehaviour {
 
     protected virtual void MoveToCollect(WorkerStates nextDesiredState)
     {
-        MoveToLocation(myArea.CollectPosition, nextDesiredState);
+        MoveToLocation(MyArea.CollectPosition, nextDesiredState);
     }
 
     protected virtual void MoveToDeposit(WorkerStates nextDesiredState)
     {
-        MoveToLocation(myArea.DepositContainerPosition, WorkerStates.Deposit);
+        MoveToLocation(MyArea.DepositContainerPosition, WorkerStates.Deposit);
     }
 
     protected void MoveToLocation(Vector2 position, WorkerStates nextDesiredState)
@@ -160,7 +161,7 @@ public abstract class WorkerBase : MonoBehaviour {
 
     protected void Deposit(WorkerStates nextDesiredState)
     {
-        myArea.DepositContainer.AddToContainer(CurrentCarryAmount);
+        MyArea.DepositContainer.AddToContainer(CurrentCarryAmount);
         CurrentCarryAmount = 0;
         UpdateCarryAmountText(CurrentCarryAmount);
         ChangeState(nextDesiredState);

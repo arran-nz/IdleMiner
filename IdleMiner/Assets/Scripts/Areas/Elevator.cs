@@ -9,6 +9,7 @@ public class Elevator : WorkingAreaBase {
         MovementSpeed = 1.25f;
         CollectionSpeed = 140;
         CarryCapacity = 200;
+
         base.Start();
     }
 

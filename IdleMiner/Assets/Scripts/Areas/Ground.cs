@@ -2,7 +2,7 @@
 using System.Collections.Generic;
 using UnityEngine;
 
-public class Mine : WorkingAreaBase {
+public class Ground : WorkingAreaBase {
 
     [SerializeField]
     private Transform collectAreaTransform;
@@ -11,10 +11,9 @@ public class Mine : WorkingAreaBase {
     {
         CollectPosition = collectAreaTransform.position;
         MovementSpeed = 0.5f;
-        CollectionSpeed = 20;
-        CarryCapacity = 50;
+        CollectionSpeed = 40;
+        CarryCapacity = 750;
 
         base.Start();
     }
-
 }

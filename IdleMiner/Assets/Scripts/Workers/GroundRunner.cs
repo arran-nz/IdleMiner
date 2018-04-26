@@ -3,47 +3,60 @@ using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
 
-public class Miner : WorkerBase {
-
+public class GroundRunner : WorkerBase {
 
     private Animator workerAnimator;
-
+    private Container collectionContainer;
 
     protected override void Awake()
     {
         base.Awake();
 
+        Elevator elevator = FindObjectOfType<Elevator>();
+        collectionContainer = elevator.DepositContainer;
+        
         workerAnimator = gameObject.GetComponentInChildren<Animator>();
-        CarryValueTextRenderer.enabled = false;
+
     }
 
     protected override void ReceiveOrders(WorkerStates nextDesiredState)
     {
         workerAnimator.Play("wait");
-        base.ReceiveOrders(nextDesiredState);
+
+        if (collectionContainer.HasValue)        {
+
+            base.ReceiveOrders(nextDesiredState);
+        }
     }
 
     protected override void Collect(WorkerStates nextDesiredState, Func<decimal, decimal> collectionMethod)
     {
         workerAnimator.Play("collect");
 
-        // Collect an infinte amount of resources from the mine
-        base.Collect(nextDesiredState, (x) => { return x; });
+        collectionMethod = collectionContainer.CollectFromContainer;
+
+        if (collectionContainer.HasValue)
+        {
+
+            base.Collect(nextDesiredState, collectionMethod);
+        }
+        else
+        {
+            ChangeState(nextDesiredState);
+        }
     }
 
     protected override void MoveToCollect(WorkerStates nextDesiredState)
     {
         workerAnimator.Play("roll");
-        WorkerSprite.flipX = true;
+        WorkerSprite.flipX = false;
         base.MoveToCollect(nextDesiredState);
     }
 
     protected override void MoveToDeposit(WorkerStates nextDesiredState)
     {
         workerAnimator.Play("roll");
-        WorkerSprite.flipX = false;
+        WorkerSprite.flipX = true;
         base.MoveToDeposit(nextDesiredState);
     }
-
-
 }

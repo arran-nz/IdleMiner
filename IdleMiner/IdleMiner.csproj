@@ -79,12 +79,14 @@
     </Reference>
   </ItemGroup>
   <ItemGroup>
-    <Compile Include="Assets\Scripts\Areas\Container.cs" />
     <Compile Include="Assets\Scripts\Areas\Elevator.cs" />
+    <Compile Include="Assets\Scripts\Areas\Ground.cs" />
     <Compile Include="Assets\Scripts\Areas\Mine.cs" />
     <Compile Include="Assets\Scripts\Areas\WorkingAreaBase.cs" />
+    <Compile Include="Assets\Scripts\Container.cs" />
     <Compile Include="Assets\Scripts\StringFormatHelper.cs" />
     <Compile Include="Assets\Scripts\Workers\ElevatorOperator.cs" />
+    <Compile Include="Assets\Scripts\Workers\GroundRunner.cs" />
     <Compile Include="Assets\Scripts\Workers\Miner.cs" />
     <Compile Include="Assets\Scripts\Workers\WorkerBase.cs" />
   </ItemGroup>
