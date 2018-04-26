@@ -15,27 +15,31 @@ public class Miner : WorkerBase {
         base.Awake();
     }
 
-    protected override void WaitForWork(WorkerStates nextDesiredState)
+    protected override void ReceiveOrders(WorkerStates nextDesiredState)
     {
         workerAnimator.Play("wait");
-        base.WaitForWork(nextDesiredState);
+        base.ReceiveOrders(nextDesiredState);
     }
 
-    protected override void Collect(WorkerStates nextDesiredState, Func<WorkerStates, WorkerStates> finishedCollecting)
+    protected override void Collect(WorkerStates nextDesiredState, Func<float, float> collectionMethod)
     {
         workerAnimator.Play("punch");
-        base.Collect(nextDesiredState, finishedCollecting);
+        base.Collect(nextDesiredState, (x) => { return x; });
     }
-    
-    protected override void MoveToLocation(Vector2 position, WorkerStates nextDesiredState)
+
+    protected override void MoveToCollect(WorkerStates nextDesiredState)
     {
-        // Make the miner face the correct direction while moving to the new location.
-        Vector2 direction = (Vector2)transform.position - position;
-        workerSprite.flipX = direction.x > 0 ? true : false;
-
         workerAnimator.Play("walk");
+        workerSprite.flipX = false;
+        base.MoveToCollect(nextDesiredState);
+    }
 
-        base.MoveToLocation(position, nextDesiredState);
+    protected override void MoveToContainer(WorkerStates nextDesiredState)
+    {
+        workerAnimator.Play("walk");
+        workerSprite.flipX = true;
+
+        base.MoveToContainer(nextDesiredState);
     }
 
 

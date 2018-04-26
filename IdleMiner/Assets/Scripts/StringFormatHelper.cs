@@ -8,7 +8,7 @@ public static class StringFormatHelper {
 	public static string GetCurrencyString (float value) {
 
         string customString = value.ToString("F2");
-        return customString + " g";
+        return customString + " a";
 
     }
 

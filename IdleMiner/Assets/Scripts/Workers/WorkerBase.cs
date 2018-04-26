@@ -39,11 +39,11 @@ public abstract class WorkerBase : MonoBehaviour {
     protected WorkerStates CurrentState { get; private set; }
     protected enum WorkerStates
     {
-        moveToCollect,
-        collect,
-        moveToDropOff,
-        dropOff,
-        waitForOrders
+        MoveToCollect,
+        Collect,
+        MoveToDeposit,
+        Deposit,
+        ReceiveOrders
     }
 
 
@@ -53,47 +53,46 @@ public abstract class WorkerBase : MonoBehaviour {
         workerSprite = gameObject.GetComponentInChildren<SpriteRenderer>();
         myArea = gameObject.GetComponentInParent<WorkingAreaBase>();
 
-        UpdateText(0);
-        ChangeState(WorkerStates.waitForOrders);
+        UpdateCarryAmountText(0);
+        ChangeState(WorkerStates.ReceiveOrders);
     }
 
-    // Update is called once per frame
     private void Update () {
 
         switch (CurrentState)
         {
-            case WorkerStates.moveToCollect:
-                MoveToCollect(WorkerStates.collect);
+            // Move to the collect position
+            case WorkerStates.MoveToCollect:
+                MoveToCollect(WorkerStates.Collect);
                 break;
-            case WorkerStates.collect:
-                Collect(WorkerStates.moveToDropOff, null);
+
+            // Collect Infinte amount unless specified on override
+            case WorkerStates.Collect:
+                Collect(WorkerStates.MoveToDeposit, (x) => { return x; });
                 break;
-            case WorkerStates.moveToDropOff:
-                MoveToContainer(WorkerStates.dropOff);
+
+            // Move to the deposit container position
+            case WorkerStates.MoveToDeposit:
+                MoveToContainer(WorkerStates.Deposit);
                 break;
-            case WorkerStates.dropOff:
-                EmptyLoad(WorkerStates.waitForOrders);
+
+            // Deposit carry amount into container
+            case WorkerStates.Deposit:
+                Deposit(WorkerStates.ReceiveOrders);
                 break;
-            case WorkerStates.waitForOrders:
-                WaitForWork(WorkerStates.moveToCollect);
+
+            // Wait for orders from manager if present
+            case WorkerStates.ReceiveOrders:
+                ReceiveOrders(WorkerStates.MoveToCollect);
                 break;
+
             default:
                 break;
         }
 
     }
 
-    /// <summary>
-    /// Called Everyime a collection amount has been update
-    /// </summary>
-    /// <param name="amount"></param>
-    protected virtual void CollectionUpdate(float amount)
-    {
-        CurrentCarryAmount += amount;
-        UpdateText(CurrentCarryAmount);
-    }
-
-    protected virtual void WaitForWork(WorkerStates nextDesiredState)
+    protected virtual void ReceiveOrders(WorkerStates nextDesiredState)
     {
         if (myArea.ManangerPresent)
         {
@@ -105,36 +104,24 @@ public abstract class WorkerBase : MonoBehaviour {
         }
     }
 
-    protected virtual void EmptyLoad(WorkerStates nextDesiredState)
+    protected virtual void Collect(WorkerStates nextDesiredState, System.Func<float, float> collectionMethod)
     {
-        myArea.AddToContainer(CurrentCarryAmount);
-        CurrentCarryAmount = 0;
-        UpdateText(CurrentCarryAmount);
-        ChangeState(nextDesiredState);
-    }
+        // Desired amount to collect each frame
+        float desiredCollectionAmount =  Time.deltaTime * CollectionSpeed;
 
-
-    protected virtual void Collect(WorkerStates nextDesiredState, System.Func<WorkerStates, WorkerStates> finishedCollecting)
-    {
-        float amountToCollect =  Time.deltaTime * CollectionSpeed;
-        // Collect amount from Resource Amount in The Working Area every frame
-        if ((CurrentCarryAmount + amountToCollect  <= CarryCapacity) && myArea.ResourceAmount > 0)
+        if ((CurrentCarryAmount + desiredCollectionAmount  <= CarryCapacity))
         {
-            myArea.CollectResources(amountToCollect, CollectionUpdate);
+            float amountCollected = collectionMethod(desiredCollectionAmount);
+
+            AddCarryAmount(amountCollected);
+
         }
         else
         {
             float remainderLeft = (CarryCapacity - CurrentCarryAmount);
-            myArea.CollectResources(remainderLeft, CollectionUpdate);
+            float amountCollected = collectionMethod(remainderLeft);
 
-            //Invote the Finished Collecting Callback if it's not NULL
-            if(finishedCollecting != null)
-            {
-                // Let the callback dertermine what the next state is and return.
-                WorkerStates callbackDesiredState = finishedCollecting.Invoke(nextDesiredState);
-                ChangeState(callbackDesiredState);
-                return;
-            }
+            AddCarryAmount(amountCollected);
 
 
             // Change to the next state
@@ -150,10 +137,10 @@ public abstract class WorkerBase : MonoBehaviour {
 
     protected virtual void MoveToContainer(WorkerStates nextDesiredState)
     {
-        MoveToLocation(myArea.ContainerPosition, WorkerStates.dropOff);
+        MoveToLocation(myArea.DepositContainerPosition, WorkerStates.Deposit);
     }
 
-    protected virtual void MoveToLocation(Vector2 position, WorkerStates nextDesiredState)
+    protected void MoveToLocation(Vector2 position, WorkerStates nextDesiredState)
     {
         if ((Vector2)transform.position != position)
         {
@@ -165,7 +152,21 @@ public abstract class WorkerBase : MonoBehaviour {
         }
     }
 
-    private void UpdateText(float newAmount)
+    protected void AddCarryAmount(float amount)
+    {
+        CurrentCarryAmount += amount;
+        UpdateCarryAmountText(CurrentCarryAmount);
+    }
+
+    protected void Deposit(WorkerStates nextDesiredState)
+    {
+        myArea.DepositContainer.AddToContainer(CurrentCarryAmount);
+        CurrentCarryAmount = 0;
+        UpdateCarryAmountText(CurrentCarryAmount);
+        ChangeState(nextDesiredState);
+    }
+
+    private void UpdateCarryAmountText(float newAmount)
     {
         carryValueText.text = StringFormatHelper.GetCurrencyString(newAmount);
     }

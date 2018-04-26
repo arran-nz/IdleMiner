@@ -5,71 +5,32 @@ using UnityEngine;
 public abstract class WorkingAreaBase : MonoBehaviour {
 
 
-    [SerializeField]
-    private TextMesh containerAmountText;
-    [SerializeField]
-    private Transform containerTransform;
+    public Container DepositContainer;
 
     public List<Vector2> CollectPositions = new List<Vector2>();
 
-    public Vector2 ContainerPosition
+    public Vector2 DepositContainerPosition
     {
         get
         {
-            return containerTransform.position;
+            return DepositContainer.transform.position;
         }
     }
 
 
     public bool ManangerPresent { get; private set; }
-    public float ContainerAmount { get; private set; }
-
-
     public float MovementSpeed { get; protected set; }
     public float CollectionSpeed { get; protected set; }
     public float CarryCapacity { get; protected set; }
-
-    public float ResourceAmount { get; set; }
 
     protected virtual void Start()
     {
         ManangerPresent = true;
     }
 
-    public void AddToContainer(float amountToAdd)
+    private void Awake()
     {
-        ContainerAmount += amountToAdd;
-        UpdateText(ContainerAmount);
-    }
-
-    public void RemoveFromContainer(float amountToRemove)
-    {
-        ContainerAmount -= amountToRemove;
-        UpdateText(ContainerAmount);
-    }
-
-
-    public void CollectResources(float amountToCollect, System.Action<float> collectionUpdate)
-    {
-        if (ResourceAmount > 0)
-        {
-            if (ResourceAmount - amountToCollect > 0)
-            {
-                ResourceAmount -= amountToCollect;
-                collectionUpdate.Invoke(amountToCollect);
-            }
-            else
-            {
-                float amountCollected = ResourceAmount;
-                ResourceAmount = 0;
-                collectionUpdate.Invoke(amountCollected);
-            }
-        }
-    }
-
-    private void UpdateText(float newAmount)
-    {
-        containerAmountText.text = StringFormatHelper.GetCurrencyString(newAmount);
+        DepositContainer = gameObject.GetComponentInChildren<Container>();
     }
 
 }

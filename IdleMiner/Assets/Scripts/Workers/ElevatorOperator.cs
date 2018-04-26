@@ -13,7 +13,6 @@ public class ElevatorOperator : WorkerBase {
     private void ChangeSelectedMine(int newIndex)
     {
         currentMineIndex = newIndex;
-        myArea.ResourceAmount = mines[newIndex].ContainerAmount;
     }
 
     protected override void Awake()
@@ -30,11 +29,10 @@ public class ElevatorOperator : WorkerBase {
 
     }
 
-    protected override void EmptyLoad(WorkerStates nextDesiredState)
+    protected override void ReceiveOrders(WorkerStates nextDesiredState)
     {
         ChangeSelectedMine(0);
-
-        base.EmptyLoad(nextDesiredState);
+        base.ReceiveOrders(nextDesiredState);
     }
 
     protected override void MoveToCollect(WorkerStates nextDesiredState)
@@ -43,38 +41,10 @@ public class ElevatorOperator : WorkerBase {
         MoveToLocation(shaftPos, nextDesiredState);
     }
 
-    protected override void Collect(WorkerStates nextDesiredState, Func<WorkerStates,WorkerStates> finishedCollecting)
+    protected override void Collect(WorkerStates nextDesiredState, Func<float, float> collectionMethod)
     {
-        base.Collect(nextDesiredState, selectMineToCollect);
-
-    }
-
-    WorkerStates selectMineToCollect(WorkerStates nextDesiredState)
-    {
-        if(CurrentCarryAmount < CarryCapacity && mines[currentMineIndex].ResourceAmount > 0)
-        {
-            if (currentMineIndex < mines.Length - 1)
-            {
-                ChangeSelectedMine(currentMineIndex+1);
-            }
-            else
-            {
-                ChangeSelectedMine(0);
-            }
-
-            return WorkerStates.moveToCollect;
-        }
-
-
-        return nextDesiredState;
-
-    }
-
-
-    protected override void CollectionUpdate(float amount)
-    {
-        mines[currentMineIndex].RemoveFromContainer(amount);
-        base.CollectionUpdate(amount);
+        // Collect from the current Mine's deposit container
+        base.Collect(nextDesiredState, mines[currentMineIndex].DepositContainer.CollectFromContainer);
     }
 
 

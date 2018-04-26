@@ -11,10 +11,10 @@ public class Mine : WorkingAreaBase {
     {
         CollectPositions.Add(collectAreaTransform.position);
 
-        MovementSpeed = 2.0f;
-        CollectionSpeed = 50f;
+        MovementSpeed = 2.5f;
+        CollectionSpeed = 70f;
         CarryCapacity = 100f;
-        ResourceAmount = Mathf.Infinity;
         base.Start();
     }
+
 }
