@@ -21,9 +21,11 @@ public class Miner : WorkerBase {
         base.ReceiveOrders(nextDesiredState);
     }
 
-    protected override void Collect(WorkerStates nextDesiredState, Func<float, float> collectionMethod)
+    protected override void Collect(WorkerStates nextDesiredState, Func<decimal, decimal> collectionMethod)
     {
         workerAnimator.Play("punch");
+
+        // Collect an infinte amount of resources from the mine
         base.Collect(nextDesiredState, (x) => { return x; });
     }
 
@@ -34,12 +36,11 @@ public class Miner : WorkerBase {
         base.MoveToCollect(nextDesiredState);
     }
 
-    protected override void MoveToContainer(WorkerStates nextDesiredState)
+    protected override void MoveToDeposit(WorkerStates nextDesiredState)
     {
         workerAnimator.Play("walk");
         workerSprite.flipX = true;
-
-        base.MoveToContainer(nextDesiredState);
+        base.MoveToDeposit(nextDesiredState);
     }
 
 

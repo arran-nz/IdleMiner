@@ -9,11 +9,11 @@ public class Mine : WorkingAreaBase {
 
     protected override void Start()
     {
-        CollectPositions.Add(collectAreaTransform.position);
-
+        CollectPosition = collectAreaTransform.position;
         MovementSpeed = 2.5f;
-        CollectionSpeed = 70f;
-        CarryCapacity = 100f;
+        CollectionSpeed = 150;
+        CarryCapacity = 75;
+
         base.Start();
     }
 

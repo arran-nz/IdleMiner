@@ -7,7 +7,7 @@ public abstract class WorkingAreaBase : MonoBehaviour {
 
     public Container DepositContainer;
 
-    public List<Vector2> CollectPositions = new List<Vector2>();
+    public Vector2 CollectPosition { get; protected set; }
 
     public Vector2 DepositContainerPosition
     {
@@ -20,8 +20,9 @@ public abstract class WorkingAreaBase : MonoBehaviour {
 
     public bool ManangerPresent { get; private set; }
     public float MovementSpeed { get; protected set; }
-    public float CollectionSpeed { get; protected set; }
-    public float CarryCapacity { get; protected set; }
+
+    public decimal CollectionSpeed { get; protected set; }
+    public decimal CarryCapacity { get; protected set; }
 
     protected virtual void Start()
     {

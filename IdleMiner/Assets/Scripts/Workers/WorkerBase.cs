@@ -18,14 +18,14 @@ public abstract class WorkerBase : MonoBehaviour {
             return myArea.MovementSpeed;
         }
     }
-    protected float CollectionSpeed
+    protected decimal CollectionSpeed
     {
         get
         {
             return myArea.CollectionSpeed;
         }
     }
-    protected float CarryCapacity
+    protected decimal CarryCapacity
     {
         get
         {
@@ -33,7 +33,7 @@ public abstract class WorkerBase : MonoBehaviour {
         }
     }
 
-    protected float CurrentCarryAmount { get; private set; }
+    protected decimal CurrentCarryAmount { get; private set; }
 
 
     protected WorkerStates CurrentState { get; private set; }
@@ -65,7 +65,7 @@ public abstract class WorkerBase : MonoBehaviour {
             case WorkerStates.MoveToCollect:
                 MoveToCollect(WorkerStates.Collect);
                 break;
-
+           
             // Collect Infinte amount unless specified on override
             case WorkerStates.Collect:
                 Collect(WorkerStates.MoveToDeposit, (x) => { return x; });
@@ -73,7 +73,7 @@ public abstract class WorkerBase : MonoBehaviour {
 
             // Move to the deposit container position
             case WorkerStates.MoveToDeposit:
-                MoveToContainer(WorkerStates.Deposit);
+                MoveToDeposit(WorkerStates.Deposit);
                 break;
 
             // Deposit carry amount into container
@@ -104,27 +104,27 @@ public abstract class WorkerBase : MonoBehaviour {
         }
     }
 
-    protected virtual void Collect(WorkerStates nextDesiredState, System.Func<float, float> collectionMethod)
+    protected virtual void Collect(WorkerStates nextDesiredState, System.Func<decimal, decimal> collectionMethod)
     {
         // Desired amount to collect each frame
-        float desiredCollectionAmount =  Time.deltaTime * CollectionSpeed;
+        decimal desiredCollectionAmount =  (decimal)Time.deltaTime * CollectionSpeed;
 
         if ((CurrentCarryAmount + desiredCollectionAmount  <= CarryCapacity))
         {
-            float amountCollected = collectionMethod(desiredCollectionAmount);
+            decimal amountCollected = collectionMethod(desiredCollectionAmount);
 
             AddCarryAmount(amountCollected);
 
         }
         else
         {
-            float remainderLeft = (CarryCapacity - CurrentCarryAmount);
-            float amountCollected = collectionMethod(remainderLeft);
+            decimal remainderLeft = (CarryCapacity - CurrentCarryAmount);
+            decimal amountCollected = collectionMethod(remainderLeft);
 
             AddCarryAmount(amountCollected);
 
 
-            // Change to the next state
+            // Change to the next state once carry amount has reached capacity
             ChangeState(nextDesiredState);
         }
 
@@ -132,10 +132,10 @@ public abstract class WorkerBase : MonoBehaviour {
 
     protected virtual void MoveToCollect(WorkerStates nextDesiredState)
     {
-        MoveToLocation(myArea.CollectPositions[0], nextDesiredState);
+        MoveToLocation(myArea.CollectPosition, nextDesiredState);
     }
 
-    protected virtual void MoveToContainer(WorkerStates nextDesiredState)
+    protected virtual void MoveToDeposit(WorkerStates nextDesiredState)
     {
         MoveToLocation(myArea.DepositContainerPosition, WorkerStates.Deposit);
     }
@@ -152,7 +152,7 @@ public abstract class WorkerBase : MonoBehaviour {
         }
     }
 
-    protected void AddCarryAmount(float amount)
+    protected void AddCarryAmount(decimal amount)
     {
         CurrentCarryAmount += amount;
         UpdateCarryAmountText(CurrentCarryAmount);
@@ -166,12 +166,12 @@ public abstract class WorkerBase : MonoBehaviour {
         ChangeState(nextDesiredState);
     }
 
-    private void UpdateCarryAmountText(float newAmount)
+    private void UpdateCarryAmountText(decimal newAmount)
     {
         carryValueText.text = StringFormatHelper.GetCurrencyString(newAmount);
     }
 
-    private void ChangeState(WorkerStates newState)
+    protected void ChangeState(WorkerStates newState)
     {
         CurrentState = newState;
     }

@@ -6,37 +6,49 @@ public class Container : MonoBehaviour {
 
     private TextMesh containerAmountText;
 
-    public float ContainerAmount { get; private set; }
+    private decimal containerAmount;
+
+    public bool HasValue
+    {
+        get
+        {
+            return containerAmount > 0;
+        }
+    }
 
     private void Awake()
     {
         containerAmountText = gameObject.GetComponentInChildren<TextMesh>();
     }
 
-    public void AddToContainer(float amountToAdd)
+    public void AddToContainer(decimal amountToAdd)
     {
-        ContainerAmount += amountToAdd;
-        UpdateContainerAmountText(ContainerAmount);
+        containerAmount += amountToAdd;
+        UpdateContainerAmountText(containerAmount);
     }
 
 
-    public virtual float CollectFromContainer(float amountToRemove)
+    public decimal CollectFromContainer(decimal amountToRemove)
     {
-        if (ContainerAmount > 0)
+        if (containerAmount > 0)
         {
-            if (ContainerAmount - amountToRemove > 0)
+            if (containerAmount - amountToRemove > 0)
             {
-                ContainerAmount -= amountToRemove;
-                UpdateContainerAmountText(ContainerAmount);
+                // Container Not Empty
+
+                containerAmount -= amountToRemove;
+                UpdateContainerAmountText(containerAmount);
 
                 return amountToRemove;
 
             }
             else
             {
-                float amountRemoved = ContainerAmount;
-                ContainerAmount = 0;
-                UpdateContainerAmountText(ContainerAmount);
+                // Container Empty
+
+                decimal amountRemoved = containerAmount;
+                containerAmount = 0;
+                UpdateContainerAmountText(containerAmount);
 
                 return amountRemoved;
 
@@ -48,7 +60,7 @@ public class Container : MonoBehaviour {
         }
     }
 
-    private void UpdateContainerAmountText(float newAmount)
+    private void UpdateContainerAmountText(decimal newAmount)
     {
         containerAmountText.text = StringFormatHelper.GetCurrencyString(newAmount);
     }
