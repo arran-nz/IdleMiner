@@ -9,12 +9,23 @@ public class Mine : WorkingAreaBase {
 
     protected override void Start()
     {
-        CollectPosition = collectAreaTransform.position;
-        MovementSpeed = 0.5f;
-        CollectionSpeed = 20;
-        CarryCapacity = 50;
-
         base.Start();
+
+        CollectPosition = collectAreaTransform.position;
+
+        WorkingAreaName = "Mine Shaft";
+
+        MovementSpeed.DisplayName = "Rolling Speed";
+        MovementSpeed.Value = 0.5m;
+
+        CollectionSpeed.DisplayName = "Mining Speed";
+        CollectionSpeed.Value = 20;
+
+        CarryCapacity.DisplayName = "Load per Miner";
+        CarryCapacity.Value = 50;
+
+        Workers.DisplayName = "Miners";
+        Workers.Value = 1;
     }
 
 }

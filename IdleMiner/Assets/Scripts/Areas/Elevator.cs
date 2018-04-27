@@ -6,11 +6,21 @@ public class Elevator : WorkingAreaBase {
 
     protected override void Start()
     {
-        MovementSpeed = 1.25f;
-        CollectionSpeed = 140;
-        CarryCapacity = 200;
-
         base.Start();
+
+        WorkingAreaName = "Elevator";
+
+        MovementSpeed.DisplayName = "Flying Speed";
+        MovementSpeed.Value = 1;
+
+        CollectionSpeed.Value = 140;
+
+        CarryCapacity.Value = 200;
+
+        Workers.DisplayName = "Elevator Birds";
+        Workers.Value = 1;
+
+
     }
 
 }

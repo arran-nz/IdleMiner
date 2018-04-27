@@ -9,11 +9,23 @@ public class Ground : WorkingAreaBase {
 
     protected override void Start()
     {
-        CollectPosition = collectAreaTransform.position;
-        MovementSpeed = 0.5f;
-        CollectionSpeed = 40;
-        CarryCapacity = 750;
-
         base.Start();
+
+        CollectPosition = collectAreaTransform.position;
+
+        WorkingAreaName = "Top Level";
+
+        MovementSpeed.DisplayName = "Movement Speed";
+        MovementSpeed.Value = 0.5m;
+
+        CollectionSpeed.DisplayName = "Loading Speed";
+        CollectionSpeed.Value = 40;
+
+        CarryCapacity.DisplayName = "Load per Blob";
+        CarryCapacity.Value = 750;
+
+        Workers.DisplayName = "Transporter Blobs";
+        Workers.Value = 1;
+
     }
 }

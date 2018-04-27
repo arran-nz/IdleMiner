@@ -5,7 +5,7 @@ using UnityEngine;
 
 public class GroundRunner : WorkerBase {
 
-    private Animator workerAnimator;
+    private Animator animator;
     private Container collectionContainer;
 
     protected override void Awake()
@@ -15,13 +15,13 @@ public class GroundRunner : WorkerBase {
         Elevator elevator = FindObjectOfType<Elevator>();
         collectionContainer = elevator.DepositContainer;
         
-        workerAnimator = gameObject.GetComponentInChildren<Animator>();
+        animator = gameObject.GetComponentInChildren<Animator>();
 
     }
 
     protected override void ReceiveOrders(WorkerStates nextDesiredState)
     {
-        workerAnimator.Play("wait");
+        animator.Play("collect");
 
         if (collectionContainer.HasValue)        {
 
@@ -31,7 +31,7 @@ public class GroundRunner : WorkerBase {
 
     protected override void Collect(WorkerStates nextDesiredState, Func<decimal, decimal> collectionMethod)
     {
-        workerAnimator.Play("collect");
+        animator.Play("collect");
 
         collectionMethod = collectionContainer.CollectFromContainer;
 
@@ -48,14 +48,14 @@ public class GroundRunner : WorkerBase {
 
     protected override void MoveToCollect(WorkerStates nextDesiredState)
     {
-        workerAnimator.Play("roll");
+        animator.Play("move");
         WorkerSprite.flipX = false;
         base.MoveToCollect(nextDesiredState);
     }
 
     protected override void MoveToDeposit(WorkerStates nextDesiredState)
     {
-        workerAnimator.Play("roll");
+        animator.Play("move");
         WorkerSprite.flipX = true;
         base.MoveToDeposit(nextDesiredState);
     }

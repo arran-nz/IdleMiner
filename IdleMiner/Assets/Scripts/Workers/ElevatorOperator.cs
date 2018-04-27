@@ -7,7 +7,7 @@ public class ElevatorOperator : WorkerBase {
 
     private Mine[] mines;
     private GameObject mineContainer;
-    private Animator workerAnimator;
+    private Animator animator;
 
     int selectedMine = 0;
 
@@ -27,7 +27,7 @@ public class ElevatorOperator : WorkerBase {
     {
         base.Awake();
 
-        workerAnimator = gameObject.GetComponentInChildren<Animator>();
+        animator = gameObject.GetComponentInChildren<Animator>();
         mineContainer = GameObject.FindGameObjectWithTag("MineContainer");
         mines = mineContainer.gameObject.GetComponentsInChildren<Mine>();
     }
@@ -40,7 +40,8 @@ public class ElevatorOperator : WorkerBase {
 
     protected override void ReceiveOrders(WorkerStates nextDesiredState)
     {
-        workerAnimator.Play("collect");
+        animator.Play("move");
+
         // Check if MineList has any value before moving to the next state
         bool foundValue = false;
         for (int i = 0; i < mines.Length; i++)

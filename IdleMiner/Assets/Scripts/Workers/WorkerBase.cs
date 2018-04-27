@@ -12,25 +12,25 @@ public abstract class WorkerBase : MonoBehaviour {
 
 
 
-    protected float MovementSpeed
+    protected decimal MovementSpeed
     {
         get
         {
-            return MyArea.MovementSpeed;
+            return MyArea.MovementSpeed.Value;
         }
     }
     protected decimal CollectionSpeed
     {
         get
         {
-            return MyArea.CollectionSpeed;
+            return MyArea.CollectionSpeed.Value;
         }
     }
     protected decimal CarryCapacity
     {
         get
         {
-            return MyArea.CarryCapacity;
+            return MyArea.CarryCapacity.Value;
         }
     }
 
@@ -145,7 +145,7 @@ public abstract class WorkerBase : MonoBehaviour {
     {
         if ((Vector2)transform.position != position)
         {
-            transform.position = Vector2.MoveTowards(transform.position, position, MovementSpeed * Time.deltaTime);
+            transform.position = Vector2.MoveTowards(transform.position, position, (float)MovementSpeed * Time.deltaTime);
         }
         else
         {
