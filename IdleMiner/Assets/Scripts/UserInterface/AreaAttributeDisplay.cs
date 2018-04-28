@@ -3,7 +3,7 @@ using System.Collections.Generic;
 using UnityEngine;
 using UnityEngine.UI;
 
-public class AreaStatDisplay : MonoBehaviour {
+public class AreaAttributeDisplay : MonoBehaviour {
 
     [SerializeField]
     private Text statNameDisplay;

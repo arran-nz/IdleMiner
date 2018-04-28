@@ -16,12 +16,17 @@ public static class StringFormatHelper
         return currency + " /s";
     }
 
+    public static string GetCapacityString(decimal value)
+    {
+        return value.ToString("F2");
+    }
+
     public static string GetMovementString(decimal value)
     {
         return value.ToString("F2");
     }
 
-    public static string GetWorkersString(decimal value)
+    public static string GetWorkersString(int value)
     {
         return value.ToString("F0");
     }

@@ -7,13 +7,12 @@ public class Mine : WorkingAreaBase {
     [SerializeField]
     private Transform collectAreaTransform;
 
-    protected override void Start()
+    protected override void Configure()
     {
-        base.Start();
-
         CollectPosition = collectAreaTransform.position;
 
         WorkingAreaName = "Mine Shaft";
+        CanAddWorkers = true;
 
         MovementSpeed.DisplayName = "Rolling Speed";
         MovementSpeed.Value = 0.5m;
@@ -26,6 +25,9 @@ public class Mine : WorkingAreaBase {
 
         Workers.DisplayName = "Miners";
         Workers.Value = 1;
+
+        // Every 10th upgrade, add a new worker
+        Workers.UpgradeMethod = (x) => { return (AreaLevel % 10 == 0) ? 1 : 0; };
     }
 
 }

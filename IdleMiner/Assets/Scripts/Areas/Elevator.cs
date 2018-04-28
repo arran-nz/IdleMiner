@@ -4,16 +4,16 @@ using UnityEngine;
 
 public class Elevator : WorkingAreaBase {
 
-    protected override void Start()
+    protected override void Configure()
     {
-        base.Start();
-
         WorkingAreaName = "Elevator";
+        CanAddWorkers = false;
 
         MovementSpeed.DisplayName = "Flying Speed";
         MovementSpeed.Value = 1;
+        MovementSpeed.UpgradeMethod = (x) => { return x * 0.01m; };
 
-        CollectionSpeed.Value = 140;
+        CollectionSpeed.Value = 50;
 
         CarryCapacity.Value = 200;
 

@@ -20,53 +20,70 @@ public abstract class WorkingAreaBase : MonoBehaviour {
 
     public bool ManangerPresent { get; private set; }
 
-    public AreaStat MovementSpeed ;
-    public AreaStat CollectionSpeed;
-    public AreaStat CarryCapacity;
-    public AreaStat Workers;
+    public AreaAttribute<decimal> MovementSpeed ;
+    public AreaAttribute<decimal> CollectionSpeed;
+    public AreaAttribute<decimal> CarryCapacity;
+    public AreaAttribute<int> Workers;
 
-    public List<AreaStat> AreaStats = new List<AreaStat>();
+    public List<AreaAttribute<decimal>> AreaAttributes = new List<AreaAttribute<decimal>>();
 
     public string WorkingAreaName { get; protected set; }
+    public bool CanAddWorkers { get; protected set; }
     public int AreaLevel { get; private set; }
     public decimal UpgradeCost { get; private set; }
 
     [SerializeField]
+    private GameObject workerPrefab;
+
+
+
+    [SerializeField]
     private UpgradePanel upgradePanel;
 
-    protected virtual void Start()
+    private void Start()
     {
         WorkingAreaName = "Working Area";
 
-        MovementSpeed = new AreaStat
+        MovementSpeed = new AreaAttribute<decimal>
         {
             DisplayName = "Movement Speed",
-            StringFormatMethod = StringFormatHelper.GetMovementString
+            StringFormatMethod = StringFormatHelper.GetMovementString,
+            UpgradeMethod = (x) => { return x * 0.02m; }
         };
 
-        CollectionSpeed = new AreaStat
+        CollectionSpeed = new AreaAttribute<decimal>
         {
             DisplayName = "Collection Speed",
-            StringFormatMethod = StringFormatHelper.GetCurrencyPerSecondString
+            StringFormatMethod = StringFormatHelper.GetCurrencyPerSecondString,
+            UpgradeMethod = (x) => { return x * 0.02m; }
         };
 
-        CarryCapacity = new AreaStat {
+        CarryCapacity = new AreaAttribute<decimal> {
             DisplayName = "Carry Capacity",
-            StringFormatMethod = StringFormatHelper.GetMovementString
+            StringFormatMethod = StringFormatHelper.GetCapacityString,
+            UpgradeMethod = (x) => { return x * 0.02m; }
         };
 
-        Workers = new AreaStat {
+        Workers = new AreaAttribute<int> {
             DisplayName = "Workers",
-            StringFormatMethod = StringFormatHelper.GetWorkersString
+            StringFormatMethod = StringFormatHelper.GetWorkersString,
+            UpgradeMethod = (x) => { return 0; }
         };
 
-        AreaStats.Add(MovementSpeed);
-        AreaStats.Add(CollectionSpeed);
-        AreaStats.Add(CarryCapacity);
-        AreaStats.Add(Workers);
+        AreaAttributes.Add(MovementSpeed);
+        AreaAttributes.Add(CollectionSpeed);
+        AreaAttributes.Add(CarryCapacity);
 
-        ManangerPresent = true;
         AreaLevel = 1;
+        ManangerPresent = true;
+
+        Configure();
+
+    }
+
+    protected virtual void Configure()
+    {
+        // Overide Custom Settings here if needed
     }
 
     private void Awake()
@@ -78,26 +95,32 @@ public abstract class WorkingAreaBase : MonoBehaviour {
     {
         upgradePanel.Initialize(this);
         upgradePanel.gameObject.SetActive(true);
-        Debug.Log("Open Upgrade Panel");
     }
 
     public void UpgradeArea()
     {
-        Debug.Log("Upgrade Area");
+        foreach (AreaAttribute<decimal> item in AreaAttributes)
+        {
+            item.Value += item.GetUpgradeAmount();
+        }
+
+        int newWorkers = Workers.GetUpgradeAmount();
+        AddWorkers(newWorkers);
+
         AreaLevel++;
     }
 
-}
-
-public class AreaStat
-{
-    public string DisplayName;
-    public System.Func<decimal, string> StringFormatMethod;
-
-    public decimal Value;
-
-    public string GetDisplayString()
+    protected void AddWorkers(int amount)
     {
-        return StringFormatMethod.Invoke(Value);
+        if(amount >= 1)
+        {
+            Workers.Value += amount;
+
+            for (int i = 0; i < amount; i++)
+            {
+                Instantiate(workerPrefab, this.transform);
+            }
+        }
     }
+
 }
