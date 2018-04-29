@@ -1,4 +1,5 @@
-﻿using System.Collections;
+﻿using System;
+using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
 
@@ -10,7 +11,12 @@ public abstract class WorkerBase : MonoBehaviour {
     protected SpriteRenderer WorkerSprite;
     protected WorkingAreaBase MyArea;
 
+    protected Func<decimal, decimal> CollectionMethod = (x) => {
+        Debug.Log("Collection Method Not Set"); return 0; };
 
+    protected Action<decimal> DepositAction = (x) => {
+        Debug.Log("Deposit Action Not Set");
+    };
 
     protected decimal MovementSpeed
     {
@@ -69,7 +75,7 @@ public abstract class WorkerBase : MonoBehaviour {
            
             // Collect Infinte amount unless specified on override
             case WorkerStates.Collect:
-                Collect(WorkerStates.MoveToDeposit, (x) => { return x; });
+                Collect(WorkerStates.MoveToDeposit);
                 break;
 
             // Move to the deposit container position
@@ -105,14 +111,14 @@ public abstract class WorkerBase : MonoBehaviour {
         }
     }
 
-    protected virtual void Collect(WorkerStates nextDesiredState, System.Func<decimal, decimal> collectionMethod)
+    protected virtual void Collect(WorkerStates nextDesiredState)
     {
         // Desired amount to collect each frame
         decimal desiredCollectionAmount =  (decimal)Time.deltaTime * CollectionSpeed;
 
         if ((CurrentCarryAmount + desiredCollectionAmount  <= CarryCapacity))
         {
-            decimal amountCollected = collectionMethod(desiredCollectionAmount);
+            decimal amountCollected = CollectionMethod(desiredCollectionAmount);
 
             AddCarryAmount(amountCollected);
 
@@ -120,7 +126,7 @@ public abstract class WorkerBase : MonoBehaviour {
         else
         {
             decimal remainderLeft = (CarryCapacity - CurrentCarryAmount);
-            decimal amountCollected = collectionMethod(remainderLeft);
+            decimal amountCollected = CollectionMethod(remainderLeft);
 
             AddCarryAmount(amountCollected);
 
@@ -138,7 +144,16 @@ public abstract class WorkerBase : MonoBehaviour {
 
     protected virtual void MoveToDeposit(WorkerStates nextDesiredState)
     {
-        MoveToLocation(MyArea.DepositContainerPosition, WorkerStates.Deposit);
+        MoveToLocation(MyArea.DepositPosition, WorkerStates.Deposit);
+    }
+
+    protected void Deposit(WorkerStates nextDesiredState)
+    {
+        DepositAction(CurrentCarryAmount);
+        CurrentCarryAmount = 0;
+
+        UpdateCarryAmountText(CurrentCarryAmount);
+        ChangeState(nextDesiredState);
     }
 
     protected void MoveToLocation(Vector2 position, WorkerStates nextDesiredState)
@@ -157,14 +172,6 @@ public abstract class WorkerBase : MonoBehaviour {
     {
         CurrentCarryAmount += amount;
         UpdateCarryAmountText(CurrentCarryAmount);
-    }
-
-    protected void Deposit(WorkerStates nextDesiredState)
-    {
-        MyArea.DepositContainer.AddToContainer(CurrentCarryAmount);
-        CurrentCarryAmount = 0;
-        UpdateCarryAmountText(CurrentCarryAmount);
-        ChangeState(nextDesiredState);
     }
 
     private void UpdateCarryAmountText(decimal newAmount)

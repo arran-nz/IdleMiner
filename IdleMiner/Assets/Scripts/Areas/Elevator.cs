@@ -1,26 +1,33 @@
-﻿using System.Collections;
-using System.Collections.Generic;
-using UnityEngine;
+﻿using UnityEngine;
 
 public class Elevator : WorkingAreaBase {
 
     protected override void Configure()
     {
+        DepositPosition = DepositContainer.transform.position;
+
         WorkingAreaName = "Elevator";
         CanAddWorkers = false;
 
-        MovementSpeed.DisplayName = "Flying Speed";
-        MovementSpeed.Value = 1;
-        MovementSpeed.UpgradeMethod = (x) => { return x * 0.01m; };
+        MovementDisplay = "Flying Speed";
+        MovementStart = 1m;
+        MovementUpgrade = 0.01m;
 
-        CollectionSpeed.Value = 50;
+        CollectionDisplay = "Collection Speed";
+        CollectionStart = 50m;
+        CollectionUpgrade = 0.1m;
 
-        CarryCapacity.Value = 200;
+        LoadDisplay = "Load per Bird";
+        LoadStart = 200m;
+        LoadUpgrade = 0.14m;
 
-        Workers.DisplayName = "Elevator Birds";
-        Workers.Value = 1;
+        WorkerDisplay = "Elevator Birds";
 
+        AreaStartLevel = 1;
 
+        AreaUpgradeCost = 32m;
+
+        base.Configure();
     }
 
 }

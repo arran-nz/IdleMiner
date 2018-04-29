@@ -1,7 +1,4 @@
-﻿using System;
-using System.Collections;
-using System.Collections.Generic;
-using UnityEngine;
+﻿using UnityEngine;
 
 public class GroundRunner : WorkerBase {
 
@@ -11,11 +8,14 @@ public class GroundRunner : WorkerBase {
     protected override void Awake()
     {
         base.Awake();
-
-        Elevator elevator = FindObjectOfType<Elevator>();
-        collectionContainer = elevator.DepositContainer;
-        
+   
         animator = gameObject.GetComponentInChildren<Animator>();
+
+        collectionContainer = GameController.Instance.Elevator.DepositContainer;
+
+        CollectionMethod = collectionContainer.CollectFromContainer;
+        DepositAction = (x) => { GameController.Instance.AddCash(x); };
+        
 
     }
 
@@ -29,16 +29,14 @@ public class GroundRunner : WorkerBase {
         }
     }
 
-    protected override void Collect(WorkerStates nextDesiredState, Func<decimal, decimal> collectionMethod)
+    protected override void Collect(WorkerStates nextDesiredState)
     {
         animator.Play("collect");
-
-        collectionMethod = collectionContainer.CollectFromContainer;
 
         if (collectionContainer.HasValue)
         {
 
-            base.Collect(nextDesiredState, collectionMethod);
+            base.Collect(nextDesiredState);
         }
         else
         {

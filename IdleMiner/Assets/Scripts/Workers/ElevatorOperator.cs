@@ -1,19 +1,15 @@
-﻿using System;
-using System.Collections;
-using System.Collections.Generic;
-using UnityEngine;
+﻿using UnityEngine;
 
 public class ElevatorOperator : WorkerBase {
 
-    private Mine[] mines;
-    private GameObject mineContainer;
     private Animator animator;
+    private MineManager mineManager;
 
     int selectedMine = 0;
 
     private int CycleMineIndex(int desiredIndex)
     {
-        if (desiredIndex < mines.Length)
+        if (desiredIndex < mineManager.MineCount)
         {
             return desiredIndex;
         }
@@ -27,15 +23,10 @@ public class ElevatorOperator : WorkerBase {
     {
         base.Awake();
 
+        mineManager = GameController.Instance.MineManager;
         animator = gameObject.GetComponentInChildren<Animator>();
-        mineContainer = GameObject.FindGameObjectWithTag("MineContainer");
-        mines = mineContainer.gameObject.GetComponentsInChildren<Mine>();
-    }
 
-    private void UpdateMineList()
-    {
-        Array.Clear(mines, 0, mines.Length);
-        mines = mineContainer.gameObject.GetComponentsInChildren<Mine>();
+        DepositAction = (x) => { MyArea.DepositContainer.AddToContainer(x); };
     }
 
     protected override void ReceiveOrders(WorkerStates nextDesiredState)
@@ -44,12 +35,12 @@ public class ElevatorOperator : WorkerBase {
 
         // Check if MineList has any value before moving to the next state
         bool foundValue = false;
-        for (int i = 0; i < mines.Length; i++)
+        for (int i = 0; i < mineManager.MineCount; i++)
         {
-            if (mines[i].DepositContainer.HasValue)
+            if (mineManager.Mines[i].DepositContainer.HasValue)
             {
                 foundValue = true;
-                i = mines.Length;
+                i = mineManager.MineCount;
             }
         }
 
@@ -65,20 +56,20 @@ public class ElevatorOperator : WorkerBase {
 
     protected override void MoveToCollect(WorkerStates nextDesiredState)
     {
-        Vector2 shaftPos = new Vector2(MyArea.transform.position.x, mines[selectedMine].transform.position.y);
+        Vector2 shaftPos = new Vector2(MyArea.transform.position.x, mineManager.Mines[selectedMine].transform.position.y);
         MoveToLocation(shaftPos, nextDesiredState);
     }
 
-    protected override void Collect(WorkerStates nextDesiredState, Func<decimal, decimal> collectionMethod)
+    protected override void Collect(WorkerStates nextDesiredState)
     {
-        // Collect from the current Mine's deposit container
-        Container currentMineContainer = mines[selectedMine].DepositContainer;
-        collectionMethod = currentMineContainer.CollectFromContainer;
+        // Set Collection from the current Mine's deposit container
+        Container currentMineContainer = mineManager.Mines[selectedMine].DepositContainer;
+        CollectionMethod = currentMineContainer.CollectFromContainer;
 
         if(currentMineContainer.HasValue)
         {
             // If CarryAmount has reached capacity it will progress to the next state
-            base.Collect(nextDesiredState, collectionMethod);
+            base.Collect(nextDesiredState);
         }
         else
         {

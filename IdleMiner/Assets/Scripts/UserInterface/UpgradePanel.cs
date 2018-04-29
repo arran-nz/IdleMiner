@@ -23,6 +23,8 @@ public class UpgradePanel : MonoBehaviour {
 
     private WorkingAreaBase workingArea;
 
+    private decimal upgradeCost;
+
     public void Initialize(WorkingAreaBase workingArea)
     {
         this.workingArea = workingArea;
@@ -39,7 +41,10 @@ public class UpgradePanel : MonoBehaviour {
     private void PopulatePanel()
     {
         headerDisplay.text = workingArea.WorkingAreaName + " Level " + workingArea.AreaLevel;
-        upgradeCostDisplay.text = StringFormatHelper.GetCurrencyString(workingArea.UpgradeCost);
+
+        upgradeCost = workingArea.UpgradeCostMethod(workingArea.AreaLevel + 1);
+
+        upgradeCostDisplay.text = StringFormatHelper.GetCurrencyString(upgradeCost);
 
         // Clear and destroy any existing attribute displays if present
         if (areaAttributeDisplays.Count > 0)
@@ -96,7 +101,6 @@ public class UpgradePanel : MonoBehaviour {
 
             visibleAttributeCount++;
         }
-
        
     }
 
@@ -115,8 +119,18 @@ public class UpgradePanel : MonoBehaviour {
 
     public void PurchaseUpgrade()
     {
-        workingArea.UpgradeArea();
-        UpdateInformation();
+        if(GameController.Instance.CurrentCash >= upgradeCost)
+        {
+            GameController.Instance.RemoveCash(upgradeCost);
+
+            workingArea.UpgradeArea();
+            UpdateInformation();
+        }
+        else
+        {
+            GameController.Instance.InsufficientFunds();
+        }
+
 
     }
 

@@ -1,33 +1,38 @@
-﻿using System.Collections;
-using System.Collections.Generic;
-using UnityEngine;
+﻿using UnityEngine;
 
 public class Ground : WorkingAreaBase {
 
     [SerializeField]
-    private Transform collectAreaTransform;
+    private Transform collectArea;
+
+    [SerializeField]
+    private Transform depositArea;
 
     protected override void Configure()
     {
-        CollectPosition = collectAreaTransform.position;
+        CollectPosition = collectArea.position;
+        DepositPosition = depositArea.transform.position;
 
         WorkingAreaName = "Top Level";
         CanAddWorkers = true;
 
-        MovementSpeed.DisplayName = "Movement Speed";
-        MovementSpeed.Value = 0.2m;
+        MovementDisplay = "Movement Speed";
+        MovementStart = 0.55m;
+        MovementUpgrade = 0.10m;
 
-        CollectionSpeed.DisplayName = "Loading Speed";
-        CollectionSpeed.Value = 30;
+        CollectionDisplay = "Loading Speed";
+        CollectionStart = 75m;
+        CollectionUpgrade = 0.13m;
 
-        CarryCapacity.DisplayName = "Load per Blob";
-        CarryCapacity.Value = 150;
+        LoadDisplay = "Load per Blob";
+        LoadStart = 150m;
+        LoadUpgrade = 0.15m;
 
-        Workers.DisplayName = "Transporter Blobs";
-        Workers.Value = 1;
+        WorkerDisplay = "Transporter Blobs";
+        ExtraWorkerUpgradeLevel = 8;
 
-        // Every 12th upgrade, add a new worker
-        Workers.UpgradeMethod = (x) => { return (AreaLevel % 12 == 0) ? 1 : 0; };
+        AreaUpgradeCost = 30m;
 
+        base.Configure();
     }
 }
