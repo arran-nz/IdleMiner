@@ -1,10 +1,7 @@
-
+IdleMiner/Library/
+IdleMiner/Temp/
 IdleMiner/.vs/
 *.lock
 *.ide
-IdleMiner/Library/
-IdleMiner/Temp/
 *.dll
-*.meta
-*.meta
 *.meta
