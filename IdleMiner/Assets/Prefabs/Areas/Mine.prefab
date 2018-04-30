@@ -796,7 +796,7 @@ MonoBehaviour:
   DepositContainer: {fileID: 0}
   workerPrefab: {fileID: 1393522646357150, guid: 7b41d6c7267e08c479773dc53577bcaa,
     type: 2}
-  WorkingAreaName: Mine Shaft
+  WorkingAreaName: dasdas
   collectAreaTransform: {fileID: 4341626595368838}
 --- !u!114 &114330659650550442
 MonoBehaviour:

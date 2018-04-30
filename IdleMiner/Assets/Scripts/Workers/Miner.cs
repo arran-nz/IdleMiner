@@ -1,5 +1,8 @@
 ﻿using UnityEngine;
 
+/// <summary>
+/// This worker collected resources and deposits them indefinitely
+/// </summary>
 public class Miner : WorkerBase {
 
     private Animator workerAnimator;
@@ -16,18 +19,28 @@ public class Miner : WorkerBase {
         DepositAction = (x) => { MyArea.DepositContainer.AddToContainer(x); };
     }
 
+    /// <summary>
+    /// Animate and execute base state
+    /// </summary>
     protected override void ReceiveOrders(WorkerStates nextDesiredState)
     {
         workerAnimator.Play("wait");
         base.ReceiveOrders(nextDesiredState);
     }
 
+    /// <summary>
+    /// Animate and execute base state
+    /// </summary>
+    /// <param name="nextDesiredState"></param>
     protected override void Collect(WorkerStates nextDesiredState)
     {
         workerAnimator.Play("collect");
         base.Collect(nextDesiredState);
     }
 
+    /// <summary>
+    /// Flip the sprite, animate and execute the base state
+    /// </summary>
     protected override void MoveToCollect(WorkerStates nextDesiredState)
     {
         workerAnimator.Play("roll");
@@ -35,6 +48,9 @@ public class Miner : WorkerBase {
         base.MoveToCollect(nextDesiredState);
     }
 
+    /// <summary>
+    /// Flip the sprite, animate and execute the base state
+    /// </summary>
     protected override void MoveToDeposit(WorkerStates nextDesiredState)
     {
         workerAnimator.Play("roll");

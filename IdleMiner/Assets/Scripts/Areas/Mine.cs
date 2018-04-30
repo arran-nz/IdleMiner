@@ -1,50 +1,60 @@
 ﻿using UnityEngine;
 
+/// <summary>
+/// The Mine Area, where resources are generated infinitely.
+/// </summary>
 public class Mine : WorkingAreaBase {
 
     [SerializeField]
     private Transform collectAreaTransform;
 
     /// <summary>
-    /// The Individual's Index from top to bottom ( From 1 > )
+    /// The Individual Minw Index from top to bottom ( From 1 > )
     /// </summary>
-    private int mineIndex;
+    private int mineIndex = 1;
+
 
     protected override void Configure()
     {
         CollectPosition = collectAreaTransform.position;
         DepositPosition = DepositContainer.transform.position;
 
+        int UpgradeCostPower = MineManager.UPGRADE_COST_POWER;
+
+        decimal indexAmount = (decimal)Mathf.Pow(UpgradeCostPower, mineIndex);
+
         WorkingAreaName = "Mine Shaft";
-        CanAddWorkers = true;
-
-        decimal startDampener = 0.75m;
-
-        MovementDisplay = "Rolling Speed";
-        MovementStart = (mineIndex * 0.5m) * startDampener;
 
         CollectionDisplay = "Mining Speed";
-        CollectionStart = (mineIndex * 20) * startDampener;
+        CollectionUpgrade = 0.10m;
+        decimal mineOneCollectionStart = 42.5m;
+        CollectionStart = indexAmount * (mineOneCollectionStart / UpgradeCostPower);
 
-        LoadDisplay = "Load per Miner";
-        LoadStart = (mineIndex * 50) * startDampener;
+        CapacityDisplay = "Load per Miner";
+        CapacityUpgrade = 0.10m;
+        decimal mineOneCapacityStart = 61.2m;
+        CapacityStart = indexAmount * (mineOneCapacityStart / UpgradeCostPower);
 
+        decimal mineOneUpgradeStart = 100m;
+        AreaUpgradeStart = (mineOneUpgradeStart * indexAmount) / UpgradeCostPower;
+        AreaUpgrade = 0.06m;
+
+        MovementDisplay = "Rolling Speed";
+        MovementUpgrade = 0.02m;
+        MovementStart = 0.4m;
+
+
+        CanAddWorkers = true;
+        InstantDeposit = true;
         WorkerDisplay = "Miners";
-        ExtraWorkerUpgradeLevel = 10;
+        ExtraWorkerUpgradeLevel = 12;
+        MaxWorkers = 6;
 
         AreaStartLevel = 1;
 
+
+
         base.Configure();
-    }
-
-    protected override void ExtraConfigCheck()
-    {
-        MovementSpeed.UpgradeMethod = (x) => { return mineIndex * (x * 0.04m); };
-        CollectionSpeed.UpgradeMethod = (x) => { return mineIndex * (x * 0.115m); };
-        CarryCapacity.UpgradeMethod = (x) => { return mineIndex * (x * 0.15m); };
-        UpgradeCostMethod = (x) => { return mineIndex * (x * 38); };
-
-        base.ExtraConfigCheck();
     }
 
     public void SetMineIndex(int x)

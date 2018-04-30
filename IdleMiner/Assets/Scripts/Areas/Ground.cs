@@ -1,5 +1,8 @@
 ﻿using UnityEngine;
 
+/// <summary>
+/// Ground Area, used to transfer resouces from the elevator shaft to market. (Selling them)
+/// </summary>
 public class Ground : WorkingAreaBase {
 
     [SerializeField]
@@ -17,21 +20,23 @@ public class Ground : WorkingAreaBase {
         CanAddWorkers = true;
 
         MovementDisplay = "Movement Speed";
-        MovementStart = 0.55m;
-        MovementUpgrade = 0.10m;
+        MovementStart = 0.35m;
+        MovementUpgrade = 0.08m;
 
         CollectionDisplay = "Loading Speed";
         CollectionStart = 75m;
-        CollectionUpgrade = 0.13m;
+        CollectionUpgrade = 0.32m;
 
-        LoadDisplay = "Load per Blob";
-        LoadStart = 150m;
-        LoadUpgrade = 0.15m;
+        CapacityDisplay = "Load per Blob";
+        CapacityStart = 150m;
+        CapacityUpgrade = 0.22m;
 
         WorkerDisplay = "Transporter Blobs";
-        ExtraWorkerUpgradeLevel = 8;
+        ExtraWorkerUpgradeLevel = 4;
+        MaxWorkers = 10;
 
-        AreaUpgradeCost = 30m;
+        AreaUpgradeStart = 100m;
+        AreaUpgrade = 0.45m;
 
         base.Configure();
     }

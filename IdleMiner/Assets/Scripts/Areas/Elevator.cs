@@ -1,5 +1,8 @@
 ﻿using UnityEngine;
 
+/// <summary>
+/// Elevator Area, used to extract resources from the mines
+/// </summary>
 public class Elevator : WorkingAreaBase {
 
     protected override void Configure()
@@ -10,22 +13,23 @@ public class Elevator : WorkingAreaBase {
         CanAddWorkers = false;
 
         MovementDisplay = "Flying Speed";
-        MovementStart = 1m;
-        MovementUpgrade = 0.01m;
+        MovementStart = 0.6m;
+        MovementUpgrade = 0.045m;
 
         CollectionDisplay = "Collection Speed";
         CollectionStart = 50m;
-        CollectionUpgrade = 0.1m;
+        CollectionUpgrade = 0.54m;
 
-        LoadDisplay = "Load per Bird";
-        LoadStart = 200m;
-        LoadUpgrade = 0.14m;
+        CapacityDisplay = "Carry Amount";
+        CapacityStart = 80m;
+        CapacityUpgrade = 0.48m;
 
         WorkerDisplay = "Elevator Birds";
 
         AreaStartLevel = 1;
 
-        AreaUpgradeCost = 32m;
+        AreaUpgradeStart = 60m;
+        AreaUpgrade = 0.5m;
 
         base.Configure();
     }

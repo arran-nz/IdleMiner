@@ -3,6 +3,9 @@ using System.Collections.Generic;
 using UnityEngine;
 using UnityEngine.UI;
 
+/// <summary>
+/// Displays area attributes and gives user an option to purchase upgrades for areas
+/// </summary>
 public class UpgradePanel : MonoBehaviour {
 
     [SerializeField]
@@ -17,34 +20,48 @@ public class UpgradePanel : MonoBehaviour {
     [SerializeField]
     private Text upgradeCostDisplay;
 
-    private const float statSpacing = 20f;
-
     private List<AreaAttributeDisplay> areaAttributeDisplays = new List<AreaAttributeDisplay>();
-
     private WorkingAreaBase workingArea;
 
-    private decimal upgradeCost;
+    /// <summary>
+    /// If the user can close the upgrade panel
+    /// </summary>
+    private bool CanClosePanel { get; set; }
+
+    #region Configuration
+
+    private const float STAT_SPACING = 20f;
+
+    #endregion
 
     public void Initialize(WorkingAreaBase workingArea)
     {
+        CanClosePanel = false;
+        StartCoroutine(AllowClosePanel(0.2f));
+
         this.workingArea = workingArea;
         PopulatePanel();
     }
 
-    private Vector3 GetAttributeSpawnPos(int count, Transform clone)
+    /// <summary>
+    /// To prevent accidently closing
+    /// </summary>
+    /// <param name="t"></param>
+    /// <returns></returns>
+    private IEnumerator AllowClosePanel(float t)
     {
-        return new Vector3(
-                clone.position.x,
-                clone.position.y - (count * (statSpacing + clone.GetComponent<RectTransform>().rect.height)));
+        yield return new WaitForSeconds(t);
+        CanClosePanel = true;
     }
 
+    /// <summary>
+    /// Polpulate the panel with information from the calling WorkingAreaBase
+    /// </summary>
     private void PopulatePanel()
     {
+        // Set Header and Upgrade Cost
         headerDisplay.text = workingArea.WorkingAreaName + " Level " + workingArea.AreaLevel;
-
-        upgradeCost = workingArea.UpgradeCostMethod(workingArea.AreaLevel + 1);
-
-        upgradeCostDisplay.text = StringFormatHelper.GetCurrencyString(upgradeCost);
+        upgradeCostDisplay.text = StringFormatter.GetCurrencyString(workingArea.CurrentUpgradeCost);
 
         // Clear and destroy any existing attribute displays if present
         if (areaAttributeDisplays.Count > 0)
@@ -68,7 +85,7 @@ public class UpgradePanel : MonoBehaviour {
             Vector3 spawnPos = GetAttributeSpawnPos(visibleAttributeCount, clone.transform);
 
             AreaAttributeDisplay currentAreaStat = clone.GetComponent<AreaAttributeDisplay>();
-            currentAreaStat.UpdateStat(
+            currentAreaStat.UpdateAttributeDisplay(
                 workingArea.Workers.DisplayName,
                 workingArea.Workers.GetDisplayString(),
                 workingArea.Workers.StringFormatMethod(workingArea.Workers.GetUpgradeAmount()),
@@ -90,7 +107,7 @@ public class UpgradePanel : MonoBehaviour {
             Vector3 spawnPos = GetAttributeSpawnPos(visibleAttributeCount, clone.transform);
 
             AreaAttributeDisplay currentAreaStat = clone.GetComponent<AreaAttributeDisplay>();
-            currentAreaStat.UpdateStat(
+            currentAreaStat.UpdateAttributeDisplay(
                 currentAttribute.DisplayName,
                 currentAttribute.GetDisplayString(),
                 currentAttribute.StringFormatMethod(currentAttribute.GetUpgradeAmount()),
@@ -104,33 +121,45 @@ public class UpgradePanel : MonoBehaviour {
        
     }
 
-
-    private void UpdateInformation()
+    /// <summary>
+    /// Calculates the next position for the Attribute display
+    /// </summary>
+    /// <returns>New Position</returns>
+    private Vector3 GetAttributeSpawnPos(int count, Transform clone)
     {
-        PopulatePanel();
+        return new Vector3(
+                clone.position.x,
+                clone.position.y - (count * (STAT_SPACING + clone.GetComponent<RectTransform>().rect.height)));
     }
 
     #region Button Activated Methods
 
+    /// <summary>
+    /// Closes the Upgrade Panel
+    /// </summary>
     public void ClosePanel()
     {
-        gameObject.SetActive(false);
+        if (CanClosePanel)
+        {
+            GameController.Instance.UI.CloseUpgradePanel();
+        }
     }
 
+    /// <summary>
+    /// Check's if you can, and purchases the upgrade
+    /// </summary>
     public void PurchaseUpgrade()
     {
-        if(GameController.Instance.CurrentCash >= upgradeCost)
-        {
-            GameController.Instance.RemoveCash(upgradeCost);
+        GameController.Instance.SpendCash(workingArea.CurrentUpgradeCost,
+            () => {
+                workingArea.UpgradeArea();
+                PopulatePanel();
 
-            workingArea.UpgradeArea();
-            UpdateInformation();
-        }
-        else
-        {
-            GameController.Instance.InsufficientFunds();
-        }
+                GameController.Instance.UI.Notification.PopNotification(
+                "Upgrade Successful!",
+                NotificationMessage.NotifcationStyle.Info);
 
+            });
 
     }
 

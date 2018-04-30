@@ -1,12 +1,21 @@
 ﻿using UnityEngine;
 
+/// <summary>
+/// This worker collects from each mine container and brings the value to the surface
+/// </summary>
 public class ElevatorOperator : WorkerBase {
 
     private Animator animator;
     private MineManager mineManager;
 
+    /// <summary>
+    /// Selected mine to collect from
+    /// </summary>
     int selectedMine = 0;
 
+    /// <summary>
+    /// Used to cycle mines without exceeding the mine array length
+    /// </summary>
     private int CycleMineIndex(int desiredIndex)
     {
         if (desiredIndex < mineManager.MineCount)
@@ -29,6 +38,10 @@ public class ElevatorOperator : WorkerBase {
         DepositAction = (x) => { MyArea.DepositContainer.AddToContainer(x); };
     }
 
+    /// <summary>
+    /// Check's if there is value for purchasing to the next state, starting from the top of the mine
+    /// </summary>
+    /// <param name="nextDesiredState"></param>
     protected override void ReceiveOrders(WorkerStates nextDesiredState)
     {
         animator.Play("move");
@@ -54,12 +67,20 @@ public class ElevatorOperator : WorkerBase {
         }
     }
 
+    /// <summary>
+    /// Move to the selected Mine shaft position
+    /// </summary>
+    /// <param name="nextDesiredState"></param>
     protected override void MoveToCollect(WorkerStates nextDesiredState)
     {
         Vector2 shaftPos = new Vector2(MyArea.transform.position.x, mineManager.Mines[selectedMine].transform.position.y);
         MoveToLocation(shaftPos, nextDesiredState);
     }
 
+    /// <summary>
+    /// Collect from the selected mine deposit container
+    /// </summary>
+    /// <param name="nextDesiredState"></param>
     protected override void Collect(WorkerStates nextDesiredState)
     {
         // Set Collection from the current Mine's deposit container

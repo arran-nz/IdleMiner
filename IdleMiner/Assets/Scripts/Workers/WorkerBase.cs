@@ -3,6 +3,9 @@ using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
 
+/// <summary>
+/// The Worker Base is the foundation for all workers
+/// </summary>
 public abstract class WorkerBase : MonoBehaviour {
 
     private TextMesh carryValueText;
@@ -17,7 +20,26 @@ public abstract class WorkerBase : MonoBehaviour {
     protected Action<decimal> DepositAction = (x) => {
         Debug.Log("Deposit Action Not Set");
     };
+    
+    // Worker States for the state machine
+    protected enum WorkerStates
+    {
+        MoveToCollect,
+        Collect,
+        MoveToDeposit,
+        Deposit,
+        ReceiveOrders
+    }
 
+    #region Properties
+
+    protected bool InstantDeposit
+    {
+        get
+        {
+            return MyArea.InstantDeposit;
+        }
+    }
     protected decimal MovementSpeed
     {
         get
@@ -39,19 +61,12 @@ public abstract class WorkerBase : MonoBehaviour {
             return MyArea.CarryCapacity.Value;
         }
     }
-
     protected decimal CurrentCarryAmount { get; private set; }
-
-
     protected WorkerStates CurrentState { get; private set; }
-    protected enum WorkerStates
-    {
-        MoveToCollect,
-        Collect,
-        MoveToDeposit,
-        Deposit,
-        ReceiveOrders
-    }
+
+    #endregion
+
+
 
     protected virtual void Awake()
     {
@@ -64,6 +79,9 @@ public abstract class WorkerBase : MonoBehaviour {
         ChangeState(WorkerStates.ReceiveOrders);
     }
 
+    /// <summary>
+    /// Called Every Frame
+    /// </summary>
     private void Update () {
 
         switch (CurrentState)
@@ -107,10 +125,14 @@ public abstract class WorkerBase : MonoBehaviour {
         }
         else
         {
-            //  WAIT FOR USER TO TAP SCREEN
+            //  TODO: Implement touch feature to progress worker on the next state.
         }
     }
 
+    /// <summary>
+    /// Collect Resouces as defined in the Collection Method
+    /// </summary>
+    /// <param name="nextDesiredState"></param>
     protected virtual void Collect(WorkerStates nextDesiredState)
     {
         // Desired amount to collect each frame
@@ -137,25 +159,52 @@ public abstract class WorkerBase : MonoBehaviour {
 
     }
 
+    /// <summary>
+    /// Move to the Collection Postion
+    /// </summary>
+    /// <param name="nextDesiredState"></param>
     protected virtual void MoveToCollect(WorkerStates nextDesiredState)
     {
         MoveToLocation(MyArea.CollectPosition, nextDesiredState);
     }
 
+    /// <summary>
+    /// Move to Deposit Position
+    /// </summary>
+    /// <param name="nextDesiredState"></param>
     protected virtual void MoveToDeposit(WorkerStates nextDesiredState)
     {
         MoveToLocation(MyArea.DepositPosition, WorkerStates.Deposit);
     }
 
-    protected void Deposit(WorkerStates nextDesiredState)
+    /// <summary>
+    /// Deposits the current load as the same rate as collection, unless instantDeposit is defined;
+    /// </summary>
+    /// <param name="nextDesiredState"></param>
+    protected virtual void Deposit(WorkerStates nextDesiredState)
     {
-        DepositAction(CurrentCarryAmount);
-        CurrentCarryAmount = 0;
+        decimal desiredDepositAmount = (decimal)Time.deltaTime * CollectionSpeed;
+        if (CurrentCarryAmount > desiredDepositAmount && !InstantDeposit)
+        {
+            DepositAction(desiredDepositAmount);
+            RemoveCarryAmount(desiredDepositAmount);
+        }
+        else
+        {
+            DepositAction(CurrentCarryAmount);
 
-        UpdateCarryAmountText(CurrentCarryAmount);
-        ChangeState(nextDesiredState);
+            CurrentCarryAmount = 0;
+            UpdateCarryAmountText(CurrentCarryAmount);
+
+            ChangeState(nextDesiredState);
+        }
     }
 
+    /// <summary>
+    /// Move to a location, when the worker has reach this It will progress states
+    /// </summary>
+    /// <param name="position"></param>
+    /// <param name="nextDesiredState"></param>
     protected void MoveToLocation(Vector2 position, WorkerStates nextDesiredState)
     {
         if ((Vector2)transform.position != position)
@@ -168,17 +217,39 @@ public abstract class WorkerBase : MonoBehaviour {
         }
     }
 
-    protected void AddCarryAmount(decimal amount)
+    /// <summary>
+    /// Add Carry Amount
+    /// </summary>
+    /// <param name="amount"></param>
+    private void AddCarryAmount(decimal amount)
     {
         CurrentCarryAmount += amount;
         UpdateCarryAmountText(CurrentCarryAmount);
     }
 
-    private void UpdateCarryAmountText(decimal newAmount)
+    /// <summary>
+    /// Remove Carry Amount
+    /// </summary>
+    /// <param name="amount"></param>
+    private void RemoveCarryAmount(decimal amount)
     {
-        carryValueText.text = StringFormatHelper.GetCurrencyString(newAmount);
+        CurrentCarryAmount -= amount;
+        UpdateCarryAmountText(CurrentCarryAmount);
     }
 
+    /// <summary>
+    /// Update Carry Amount Text
+    /// </summary>
+    /// <param name="newAmount"></param>
+    private void UpdateCarryAmountText(decimal newAmount)
+    {
+        carryValueText.text = StringFormatter.GetCurrencyString(newAmount);
+    }
+
+    /// <summary>
+    /// Change State
+    /// </summary>
+    /// <param name="newState"></param>
     protected void ChangeState(WorkerStates newState)
     {
         CurrentState = newState;

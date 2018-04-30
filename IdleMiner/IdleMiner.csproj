@@ -13,12 +13,14 @@
     <TargetFrameworkIdentifier>.NETFramework</TargetFrameworkIdentifier>
     <TargetFrameworkVersion>v3.5</TargetFrameworkVersion>
     <TargetFrameworkProfile>Unity Subset v3.5</TargetFrameworkProfile>
-    <CompilerResponseFile></CompilerResponseFile>
+    <CompilerResponseFile>
+    </CompilerResponseFile>
     <UnityProjectGenerator>VSTU</UnityProjectGenerator>
     <UnityProjectType>Game:1</UnityProjectType>
     <UnityBuildTarget>StandaloneWindows64:19</UnityBuildTarget>
     <UnityVersion>2017.1.2f1</UnityVersion>
-    <RootNamespace></RootNamespace>
+    <RootNamespace>
+    </RootNamespace>
     <LangVersion>4</LangVersion>
   </PropertyGroup>
   <PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'Debug|AnyCPU' ">
@@ -86,11 +88,14 @@
     <Compile Include="Assets\Scripts\Areas\Ground.cs" />
     <Compile Include="Assets\Scripts\Areas\Mine.cs" />
     <Compile Include="Assets\Scripts\Areas\MineManager.cs" />
+    <Compile Include="Assets\Scripts\Camera\CameraController.cs" />
     <Compile Include="Assets\Scripts\GameController.cs" />
     <Compile Include="Assets\Scripts\SpriteButton.cs" />
     <Compile Include="Assets\Scripts\StringFormatHelper.cs" />
     <Compile Include="Assets\Scripts\UserInterface\AreaAttributeDisplay.cs" />
+    <Compile Include="Assets\Scripts\UserInterface\NotificationMessage.cs" />
     <Compile Include="Assets\Scripts\UserInterface\UpgradePanel.cs" />
+    <Compile Include="Assets\Scripts\UserInterface\UserInterfaceManager.cs" />
     <Compile Include="Assets\Scripts\Workers\ElevatorOperator.cs" />
     <Compile Include="Assets\Scripts\Workers\GroundRunner.cs" />
     <Compile Include="Assets\Scripts\Workers\Miner.cs" />

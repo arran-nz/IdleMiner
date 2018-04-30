@@ -3,6 +3,9 @@ using System.Collections.Generic;
 using UnityEngine;
 using UnityEngine.UI;
 
+/// <summary>
+/// Displays Area Attributes
+/// </summary>
 public class AreaAttributeDisplay : MonoBehaviour {
 
     [SerializeField]
@@ -12,7 +15,10 @@ public class AreaAttributeDisplay : MonoBehaviour {
     [SerializeField]
     private Text additionalValueDisplay;
 
-    public void UpdateStat(string statName, string currentValue, string additionalValue, Vector3 position)
+    /// <summary>
+    /// Updates the text fields and position for the attribute display
+    /// </summary>
+    public void UpdateAttributeDisplay(string statName, string currentValue, string additionalValue, Vector3 position)
     {
         statNameDisplay.text = statName;
         currentValueDisplay.text = currentValue;

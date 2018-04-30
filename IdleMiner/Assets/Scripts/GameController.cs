@@ -1,8 +1,8 @@
-﻿using System.Collections;
-using System.Collections.Generic;
-using UnityEngine;
-using UnityEngine.UI;
+﻿using UnityEngine;
 
+/// <summary>
+/// Contains cash and used to reach sub managers
+/// </summary>
 public class GameController : MonoBehaviour {
 
     // Singleton Instance
@@ -12,21 +12,22 @@ public class GameController : MonoBehaviour {
     public MineManager MineManager;
 
     [SerializeField]
-    public UpgradePanel UpgradePanel;
+    public UserInterfaceManager UI;
 
     [SerializeField]
     public Elevator Elevator;
 
-    [SerializeField]
-    private Text cashDisplay;
-
-    private const decimal STARTCASH = 20m;
-
     public decimal CurrentCash { get; private set; }
+
+    #region Configuration
+
+    private const decimal START_CASH = 500m;
+
+    #endregion
 
     public void Start()
     {
-        AddCash(STARTCASH);
+        AddCash(START_CASH);
     }
 
     private void Awake()
@@ -34,30 +35,46 @@ public class GameController : MonoBehaviour {
         SingletonSetup();
     }
 
+    /// <summary>
+    /// Add cash to spendable amount
+    /// </summary>
+    /// <param name="value"></param>
     public void AddCash(decimal value)
     {
         CurrentCash += value;
-        cashDisplay.text = StringFormatHelper.GetCurrencyString(CurrentCash);
+        UI.CashDisplay.text = StringFormatter.GetCurrencyString(CurrentCash);
     }
 
-    public void RemoveCash(decimal value)
+    /// <summary>
+    /// Spend cash stored in the Game Controller
+    /// </summary>
+    /// <param name="cost">Cost of purchase</param>
+    /// <param name="purchaseSuccessful">This is called if the purchase is succesful</param>
+    public void SpendCash(decimal cost, System.Action purchaseSuccessful)
     {
-        if ((CurrentCash - value) >= 0)
+        if ((CurrentCash - cost) >= 0)
         {
-            CurrentCash -= value;
-            cashDisplay.text = StringFormatHelper.GetCurrencyString(CurrentCash);
+            CurrentCash -= cost;
+            UI.CashDisplay.text = StringFormatter.GetCurrencyString(CurrentCash);
+            purchaseSuccessful.Invoke();
         }
         else
         {
-            Debug.LogError("Game Controller: Attempting to remove more cash than available!");
+            InsufficientFunds();
         }
     }
 
-    public void InsufficientFunds()
+    /// <summary>
+    /// Display Insufficient Funds Message
+    /// </summary>
+    private void InsufficientFunds()
     {
-        Debug.Log("No Money, Shame");
+        UI.Notification.PopNotification("Insuffient Funds", NotificationMessage.NotifcationStyle.Alert);
     }
 
+    /// <summary>
+    /// Ensures only one instance of GameController.cs
+    /// </summary>
     private void SingletonSetup()
     {
         if (Instance == null)
