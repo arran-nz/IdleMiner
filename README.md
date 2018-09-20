@@ -4,6 +4,8 @@ This is a basic Idle Mining Game where the goal is to accumulate wealth exponent
 
 Developed using Unity **2017.1.2** from *24/04/2018 - 30/04/2018*.
 
+>**I know why you're here.**
+
 
 Setting Up
 ----
