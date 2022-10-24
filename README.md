@@ -1,3 +1,5 @@
+[![ko-fi](https://ko-fi.com/img/githubbutton_sm.svg)](https://ko-fi.com/F1F3FW513)
+
 # Idle Miner
 
 This is a basic Idle Mining Game where the goal is to accumulate wealth exponentially!
@@ -13,10 +15,6 @@ Camera Controller
 Holding the left mouse button down while the cursor is in either at the top or bottom of the screen will move the camera up and down respectively.
 For more information where to click, please see this [image](https://github.com/Azza292/IdleMiner/blob/master/IdleMiner/Screenshots/CameraController.png).
 
-Art
----
-
-Character Sprites: [GrafxKid](https://twitter.com/GrafxKid])
 
 Screenshots
 ----
@@ -34,7 +32,10 @@ Screenshots
 </ul>
 
 
+Attribution
+----
 
+Character Sprites: [GrafxKid](https://grafxkid.carrd.co/)
 
 License
 ----
